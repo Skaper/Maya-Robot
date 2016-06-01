@@ -1,0 +1,52 @@
+	1. Узнаем Vendor ID:
+~ # lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 005 Device 003: ID 05ac:8240 Apple, Inc. Built-in IR Receiver
+Bus 005 Device 004: ID 05ac:8205 Apple, Inc. Bluetooth HCI
+Bus 005 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 004 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 003 Device 005: ID 2341:0042 Arduino SA Mega 2560 R3 (CDC ACM)
+Bus 003 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+Bus 002 Device 004: ID 046d:c52f Logitech, Inc. Unifying Receiver
+Bus 002 Device 001: ID 1d6b:0001 Linux Foundation 1.1 root hub
+	2. Узнаем Serial:
+~ # udevadm info --query=all --name=/dev/ttyACM0
+P: /devices/pci0000:00/0000:00:1d.1/usb3/3-1/3-1:1.0/tty/ttyACM0
+N: ttyACM0
+S: serial/by-id/usb-Arduino__www.arduino.cc__0042_553303437313515171D0-if00
+S: serial/by-path/pci-0000:00:1d.1-usb-0:1:1.0
+E: DEVLINKS=/dev/serial/by-id/usb-Arduino__www.arduino.cc__0042_553303437313515171D0-if00 /dev/serial/by-path/pci-0000:00:1d.1-usb-0:1:1.0
+E: DEVNAME=/dev/ttyACM0
+E: DEVPATH=/devices/pci0000:00/0000:00:1d.1/usb3/3-1/3-1:1.0/tty/ttyACM0
+E: ID_BUS=usb
+E: ID_MM_CANDIDATE=1
+E: ID_MODEL=0042
+E: ID_MODEL_ENC=0042
+E: ID_MODEL_FROM_DATABASE=Mega 2560 R3 (CDC ACM)
+E: ID_MODEL_ID=0042
+E: ID_PATH=pci-0000:00:1d.1-usb-0:1:1.0
+E: ID_PATH_TAG=pci-0000_00_1d_1-usb-0_1_1_0
+E: ID_REVISION=0001
+E: ID_SERIAL=Arduino__www.arduino.cc__0042_553303437313515171D0
+E: ID_SERIAL_SHORT=553303437313515171D0
+E: ID_TYPE=generic
+E: ID_USB_CLASS_FROM_DATABASE=Communications
+E: ID_USB_DRIVER=cdc_acm
+E: ID_USB_INTERFACES=:020201:0a0000:
+E: ID_USB_INTERFACE_NUM=00
+E: ID_VENDOR=Arduino__www.arduino.cc_
+E: ID_VENDOR_ENC=Arduino\x20\x28www.arduino.cc\x29
+E: ID_VENDOR_FROM_DATABASE=Arduino SA
+E: ID_VENDOR_ID=2341
+E: MAJOR=166
+E: MINOR=0
+E: SUBSYSTEM=tty
+E: USEC_INITIALIZED=1864227
+	3. UDEV rules Создаем ссылку на девайс:
+~ # sudo gedit /etc/udev/rules.d/99-usb-serial.rules
+	Записываем в него
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2341", ATTRS{idProduct}=="0042", ATTRS{serial}=="553303437313515171D0", SYMLINK+="arduinoHead"
+	4. Проверка
+~ # ls -l /dev/arduinoHead
+lrwxrwxrwx 1 root root 7 авг.  22 03:16 /dev/arduinoLeft -> ttyACM1
+
